@@ -1,4 +1,4 @@
-package cards;
+package components.cards;
 
 public enum Suit {
     HEART,
