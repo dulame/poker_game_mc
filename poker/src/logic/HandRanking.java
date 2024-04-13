@@ -60,5 +60,5 @@ public enum HandRanking {
         public String toString() {
             return "Highest Card";
         }
-    };
+    }
 }

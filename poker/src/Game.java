@@ -9,14 +9,13 @@ import java.util.Scanner;
 
 public class Game {
     private boolean onGame;
-    private Scanner sc;
 
     public Game() {
         onGame = true;
     }
 
     public void run() {
-        sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
 
         newBatch();
         while (onGame) {

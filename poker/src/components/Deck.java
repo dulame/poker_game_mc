@@ -34,10 +34,6 @@ public class Deck {
         Collections.shuffle(cards);
     }
 
-    public void deal(Player player) {
-        player.receiveCard(cards.pop());
-    }
-
     public void deal(Player player, int n) {
         for (int i = 0; i < n; ++i)
             player.receiveCard(cards.pop());

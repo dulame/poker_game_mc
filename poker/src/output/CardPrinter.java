@@ -1,6 +1,5 @@
 package output;
 
-import components.Player;
 import components.cards.Card;
 
 import java.util.ArrayList;
