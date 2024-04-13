@@ -38,6 +38,11 @@ public class Deck {
         player.receiveCard(cards.pop());
     }
 
+    public void deal(Player player, int n) {
+        for (int i = 0; i < n; ++i)
+            player.receiveCard(cards.pop());
+    }
+
     @Override
     public String toString() {
         return "components.Deck{" +

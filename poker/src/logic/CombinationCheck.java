@@ -3,9 +3,7 @@ package logic;
 import components.cards.Card;
 import components.cards.Value;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class CombinationCheck {
@@ -15,16 +13,65 @@ public class CombinationCheck {
                 .toList());
 
         Collections.sort(cards);
+        Map<Value, Integer> countRank = getRankCount(cards);
 
         if (royalFlush(cards)) return new Combination(HandRanking.ROYAL_FLUSH, cards.get(4));
+
         if (straightFlush(cards)) return new Combination(HandRanking.STRAIGHT_FLUSH, cards.get(4));
-        if (fourOfKind(cards) != null) return fourOfKind(cards);
-        if (fullHouse(cards) != null) return fullHouse(cards);
-        if (checkFlush(cards)) return new Combination(HandRanking.FLUSH, cards.get(4));
-        if (checkStraight(cards)) return new Combination(HandRanking.STRAIGHT, cards.get(4));
-        if (threeOfKind(cards) != null) return threeOfKind(cards);
-        if (twoPairs(cards) != null) return twoPairs(cards);
-        if (pair(cards) != null) return pair(cards);
+
+        if (checkFourOfKind(countRank)) {
+            for (Card card: cards) {
+                if (countRank.get(card.getValue()) == 4) {
+                    return new Combination(HandRanking.FOUR, card);
+                }
+            }
+        }
+
+        if (checkFullHouse(countRank)) {
+            for (Card card: cards) {
+                if (countRank.get(card.getValue()) == 3) {
+                    return new Combination(HandRanking.FULL_HOUSE, card);
+                }
+            }
+        }
+
+        if (checkFlush(cards)) {
+            return new Combination(HandRanking.FLUSH, cards.get(4));
+        }
+
+        if (checkStraight(cards)) {
+            return new Combination(HandRanking.STRAIGHT, cards.get(4));
+        }
+
+        if (checkThreeOfKind(countRank)) {
+            for (Card card: cards) {
+                if (countRank.get(card.getValue()) == 3) {
+                    return new Combination(HandRanking.THREE, card);
+                }
+            }
+        }
+
+        if (checkTwoPairs(countRank)) {
+            Card highest = null;
+
+            for (Card card: cards) {
+                if (countRank.get(card.getValue()) == 2) {
+                    if (highest == null) highest = card;
+                    else {
+                        highest = (highest.getNumericValue() > card.getNumericValue() ? highest : card);
+                        return new Combination(HandRanking.TWO_PAIR, highest);
+                    }
+                }
+            }
+        }
+
+        if (checkPair(countRank)) {
+            for (Card card: cards) {
+                if (countRank.get(card.getValue()) == 2) {
+                    return new Combination(HandRanking.PAIR, card);
+                }
+            }
+        }
 
         return new Combination(HandRanking.HIGH, cards.get(4));
     }
@@ -37,13 +84,25 @@ public class CombinationCheck {
         return checkFlush(cards) && checkStraight(cards);
     }
 
-    private static boolean checkStraight(ArrayList<Card> cards) {
-        for (int i = 0; i < cards.size() - 1; ++i) {
-            if (cards.get(i).getNumericValue() + 1 != cards.get(i + 1).getNumericValue()) {
-                return false;
+    private static boolean checkFourOfKind(Map<Value, Integer> countRank) {
+        for (int count: countRank.values()) {
+            if (count == 4) return true;
+        }
+        return false;
+    }
+
+    private static boolean checkFullHouse(Map<Value, Integer> countRank) {
+        boolean isThree = false, isPair = false;
+
+        for (int count : countRank.values()) {
+            if (count == 3) {
+                isThree = true;
+            } else if (count == 2) {
+                isPair = true;
             }
         }
-        return true;
+
+        return isPair && isThree;
     }
 
     private static boolean checkFlush(ArrayList<Card> cards) {
@@ -55,82 +114,46 @@ public class CombinationCheck {
         return true;
     }
 
-    private static Combination fourOfKind(ArrayList<Card> cards) {
-        ArrayList<Card> temp = new ArrayList<>();
-
-        for (int i = 0; i < 2; ++i) {
-            for (int j = i + 1; j < cards.size(); ++j) {
-                if (cards.get(i).getValue() == cards.get(j).getValue()) {
-                    if (temp.size() == 0) temp.add(cards.get(i));
-
-                    temp.add(cards.get(j));
-                } else {
-                    if (temp.size() == 4) {
-                        return new Combination(HandRanking.FOUR, cards.get(i));
-                    } else return null;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private static Combination fullHouse(ArrayList<Card> cards) {
-        if (cards.get(0) != cards.get(1)) return null;
-        if (cards.get(2) == cards.get(3) && cards.get(3) == cards.get(4)) {
-            return new Combination(HandRanking.FULL_HOUSE, cards.get(4));
-        }
-        return null;
-    }
-
-    private static Combination threeOfKind(ArrayList<Card> cards) {
-        ArrayList<Card> temp = new ArrayList<>();
-
-        for (int i = 0; i < 3; ++i) {
-            for (int j = i + 1; j < cards.size(); ++j) {
-                if (cards.get(i).getValue() == cards.get(j).getValue()) {
-                    if (temp.size() == 0) temp.add(cards.get(i));
-
-                    temp.add(cards.get(j));
-                } else {
-                    if (temp.size() == 3) {
-                        return new Combination(HandRanking.THREE, cards.get(i));
-                    } else return null;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private static Combination twoPairs(ArrayList<Card> cards) {
-        ArrayList<Card> temp = new ArrayList<>();
-
+    private static boolean checkStraight(ArrayList<Card> cards) {
         for (int i = 0; i < cards.size() - 1; ++i) {
-            if (cards.get(i).getValue() == cards.get(i + 1).getValue()) {
-                temp.add(cards.get(i));
-                temp.add(cards.get(i + 1));
-                i++;
+            if (cards.get(i).getNumericValue() + 1 != cards.get(i + 1).getNumericValue()) {
+                return false;
             }
         }
-
-        if (temp.size() == 4) return new Combination(HandRanking.TWO_PAIR, temp.get(3));
-        return null;
+        return true;
     }
 
-    private static Combination pair(ArrayList<Card> cards) {
-        Card highest = null;
-        boolean res = false;
+    private static boolean checkThreeOfKind(Map<Value, Integer> countRank) {
+        for (int count : countRank.values()) {
+            if (count == 3) return true;
+        }
+        return false;
+    }
 
-        for (int i = 0; i < cards.size() - 1; ++i) {
-            if (cards.get(i).getValue() == cards.get(i + 1).getValue()) {
-                res = true;
-                highest = cards.get(i);
-                break;
-            }
+    private static boolean checkTwoPairs(Map<Value, Integer> countRank) {
+        int pairCount = 0;
+
+        for (int count : countRank.values()) {
+            if (count == 2) pairCount++;
         }
 
-        if (res) return new Combination(HandRanking.PAIR, highest);
-        return null;
+        return pairCount == 2;
+    }
+
+    private static boolean checkPair(Map<Value, Integer> countRank) {
+        for (int count : countRank.values()) {
+            if (count == 2) return true;
+        }
+        return false;
+    }
+
+    private static Map<Value, Integer> getRankCount(ArrayList<Card> cards) {
+        Map<Value, Integer> rankCount = new HashMap<>();
+
+        for (Card card : cards) {
+            rankCount.put(card.getValue(), rankCount.getOrDefault(card.getValue(), 0) + 1);
+        }
+
+        return rankCount;
     }
 }

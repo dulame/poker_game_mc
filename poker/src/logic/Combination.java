@@ -2,7 +2,7 @@ package logic;
 
 import components.cards.Card;
 
-public class Combination implements Comparable<Combination> {
+public class Combination {
     private final HandRanking handRanking;
     private final Card highestCard;
 
@@ -20,22 +20,7 @@ public class Combination implements Comparable<Combination> {
     }
 
     @Override
-    public int compareTo(Combination o) {
-        if (handRanking.getValue() > o.getHandRanking().getValue()) {
-            return 1;
-        } else if (handRanking.getValue() < o.getHandRanking().getValue()) {
-            return -1;
-        }
-
-        return Integer.compare(highestCard.getNumericValue(),
-                o.getHighestCard().getNumericValue());
-    }
-
-    @Override
     public String toString() {
-        return "Combination{" +
-                "handRanking=" + handRanking +
-                ", highestCard=" + highestCard +
-                '}';
+        return handRanking.toString();
     }
 }

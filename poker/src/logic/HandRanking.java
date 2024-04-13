@@ -1,31 +1,64 @@
 package logic;
 
 public enum HandRanking {
-    ROYAL_FLUSH(9),
-    STRAIGHT_FLUSH(8),
-    FOUR(7),
-    FULL_HOUSE(6),
-    FLUSH(5),
-    STRAIGHT(4),
-    THREE(3),
-    TWO_PAIR(2),
-    PAIR(1),
-    HIGH(0);
-
-    private final int value;
-
-    HandRanking(int value) {
-        this.value = value;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return "HandRanking{" +
-                "value=" + value +
-                '}';
-    }
+    ROYAL_FLUSH {
+        @Override
+        public String toString() {
+            return "Royal Flush";
+        }
+    },
+    STRAIGHT_FLUSH {
+        @Override
+        public String toString() {
+            return "Straight Flush";
+        }
+    },
+    FOUR {
+        @Override
+        public String toString() {
+            return "Four Of Kind";
+        }
+    },
+    FULL_HOUSE {
+        @Override
+        public String toString() {
+            return "Full House";
+        }
+    },
+    FLUSH {
+        @Override
+        public String toString() {
+            return "Flush";
+        }
+    },
+    STRAIGHT {
+        @Override
+        public String toString() {
+            return "Straight";
+        }
+    },
+    THREE {
+        @Override
+        public String toString() {
+            return "Three Of Kind";
+        }
+    },
+    TWO_PAIR {
+        @Override
+        public String toString() {
+            return "Tow Pairs";
+        }
+    },
+    PAIR {
+        @Override
+        public String toString() {
+            return "Pair";
+        }
+    },
+    HIGH {
+        @Override
+        public String toString() {
+            return "Highest Card";
+        }
+    };
 }
