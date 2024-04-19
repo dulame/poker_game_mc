@@ -8,16 +8,32 @@ import java.util.stream.Stream;
 
 public class CombinationCheck {
     public static Combination getCombination(ArrayList<Card> playerCards, ArrayList<Card> dealerCards) {
+        Combination dealerCombination = getCombination(dealerCards, dealerCards.size() - 1);
+
         ArrayList<Card> cards = new java.util.ArrayList<>(Stream.of(playerCards, dealerCards)
                 .flatMap(Collection::stream)
                 .toList());
 
+        Combination overCombination = getCombination(cards, cards.size() - 1);
+
+        if (dealerCombination.equals(overCombination)) {
+            if (playerCards.get(0).getNumericValue() > playerCards.get(1).getNumericValue()) {
+                return new Combination(HandRanking.HIGH, cards.get(0));
+            } else {
+                return new Combination(HandRanking.HIGH, cards.get(1));
+            }
+        }
+
+        return overCombination;
+    }
+
+    private static Combination getCombination(ArrayList<Card> cards, int lastIndex) {
         Collections.sort(cards);
         Map<Value, Integer> countRank = getRankCount(cards);
 
-        if (royalFlush(cards)) return new Combination(HandRanking.ROYAL_FLUSH, cards.get(4));
+        if (royalFlush(cards)) return new Combination(HandRanking.ROYAL_FLUSH, cards.get(lastIndex));
 
-        if (straightFlush(cards)) return new Combination(HandRanking.STRAIGHT_FLUSH, cards.get(4));
+        if (straightFlush(cards)) return new Combination(HandRanking.STRAIGHT_FLUSH, cards.get(lastIndex));
 
         if (checkFourOfKind(countRank)) {
             for (Card card: cards) {
@@ -36,11 +52,11 @@ public class CombinationCheck {
         }
 
         if (checkFlush(cards)) {
-            return new Combination(HandRanking.FLUSH, cards.get(4));
+            return new Combination(HandRanking.FLUSH, cards.get(lastIndex));
         }
 
         if (checkStraight(cards)) {
-            return new Combination(HandRanking.STRAIGHT, cards.get(4));
+            return new Combination(HandRanking.STRAIGHT, cards.get(lastIndex));
         }
 
         if (checkThreeOfKind(countRank)) {
@@ -73,7 +89,7 @@ public class CombinationCheck {
             }
         }
 
-        return new Combination(HandRanking.HIGH, cards.get(4));
+        return new Combination(HandRanking.HIGH, cards.get(lastIndex));
     }
 
     private static boolean royalFlush(ArrayList<Card> cards) {

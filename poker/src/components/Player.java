@@ -18,6 +18,10 @@ public class Player {
         return combination;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public ArrayList<Card> getCards() {
         return cards;
     }

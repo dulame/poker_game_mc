@@ -2,23 +2,14 @@ package logic;
 
 import components.Player;
 
-public class Compare {
-    public static void compare(Player player1, Player player2) {
-        Combination combination1 = player1.getCombination();
-        Combination combination2 = player2.getCombination();
+import java.util.Arrays;
+import java.util.List;
 
-        if (combination1.getHandRanking().ordinal() < combination2.getHandRanking().ordinal()) {
-            System.out.printf("%s won!\n", player1);
-        } else if (combination1.getHandRanking().ordinal() > combination2.getHandRanking().ordinal()) {
-            System.out.printf("%s won!\n", player2);
-        } else {
-            if (combination1.getHighestCard().compareTo(combination2.getHighestCard()) > 0) {
-                System.out.printf("%s won!\n", player1);
-            } else if (combination1.getHighestCard().compareTo(combination2.getHighestCard()) < 0) {
-                System.out.printf("%s won!\n", player2);
-            } else {
-                System.out.println("Draw");
-            }
-        }
+public class Compare {
+    public static void compare(Player ... players) {
+        List<Player> list = Arrays.asList(players);
+        list.sort(new PlayerComparator());
+
+        System.out.println(list.get(list.size() - 1).getName() + " have won!");
     }
 }

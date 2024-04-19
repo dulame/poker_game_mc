@@ -46,7 +46,7 @@ public enum HandRanking {
     TWO_PAIR {
         @Override
         public String toString() {
-            return "Tow Pairs";
+            return "Two Pairs";
         }
     },
     PAIR {
