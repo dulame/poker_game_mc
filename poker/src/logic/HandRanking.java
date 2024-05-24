@@ -60,5 +60,11 @@ public enum HandRanking {
         public String toString() {
             return "Highest Card";
         }
+    },
+    ERROR {
+        @Override
+        public String toString() {
+            return "ERROR";
+        }
     }
 }

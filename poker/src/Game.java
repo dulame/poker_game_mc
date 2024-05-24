@@ -60,7 +60,7 @@ public class Game {
         PlayerInfoPrinter.playerInfoPrinter(player3);
         PlayerInfoPrinter.playerCombinationPrinter(player3);
 
-        Compare.compare(player1, player2, player3);
+        Compare.comparePlayers(player1, player2, player3);
 
         CardPrinter.newBatch();
     }

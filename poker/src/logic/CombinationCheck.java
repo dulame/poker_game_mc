@@ -1,6 +1,7 @@
 package logic;
 
 import components.cards.Card;
+import components.cards.Suit;
 import components.cards.Value;
 
 import java.util.*;
@@ -8,15 +9,28 @@ import java.util.stream.Stream;
 
 public class CombinationCheck {
     public static Combination getCombination(ArrayList<Card> playerCards, ArrayList<Card> dealerCards) {
+        if (playerCards.size() != 2 || dealerCards.size() != 5) {
+            return new Combination(HandRanking.ERROR, null);
+        }
+
         Combination dealerCombination = getCombination(dealerCards, dealerCards.size() - 1);
 
         ArrayList<Card> cards = new java.util.ArrayList<>(Stream.of(playerCards, dealerCards)
                 .flatMap(Collection::stream)
                 .toList());
 
-        Combination overCombination = getCombination(cards, cards.size() - 1);
+        Collections.sort(cards);
 
-        if (dealerCombination.equals(overCombination)) {
+        int index = cards.size() - playerCards.size() - 1;
+
+        Combination combination1to5 = getCombination(getSubList(cards, 0, 5), index);
+        Combination combination2to6 = getCombination(getSubList(cards, 1, 6), index);
+        Combination combination3to7 = getCombination(getSubList(cards, 2, 7), index);
+        Combination combinationFlush = getCombination(cards, cards.size() - 1);
+
+        Combination combination = Compare.highestCombination(combination1to5, combination2to6, combination3to7, combinationFlush);
+
+        if (dealerCombination.equals(combination)) {
             if (playerCards.get(0).getNumericValue() > playerCards.get(1).getNumericValue()) {
                 return new Combination(HandRanking.HIGH, cards.get(0));
             } else {
@@ -24,11 +38,19 @@ public class CombinationCheck {
             }
         }
 
-        return overCombination;
+        return combination;
+    }
+
+    private static ArrayList<Card> getSubList(ArrayList<Card> cards, int from, int to) {
+        ArrayList<Card> res = new ArrayList<>();
+
+        for (int i = from; i < to; ++i) {
+            res.add(cards.get(i));
+        }
+        return res;
     }
 
     private static Combination getCombination(ArrayList<Card> cards, int lastIndex) {
-        Collections.sort(cards);
         Map<Value, Integer> countRank = getRankCount(cards);
 
         if (royalFlush(cards)) return new Combination(HandRanking.ROYAL_FLUSH, cards.get(lastIndex));
@@ -122,12 +144,17 @@ public class CombinationCheck {
     }
 
     private static boolean checkFlush(ArrayList<Card> cards) {
-        for (int i = 0; i < cards.size() - 1; ++i) {
-            if (cards.get(i).getSuit() != cards.get(i + 1).getSuit()) {
-                return false;
-            }
+        Map<Suit, Integer> suitCount = new HashMap<>();
+
+        for (Card card : cards) {
+            suitCount.put(card.getSuit(), suitCount.getOrDefault(card.getSuit(), 0) + 1);
         }
-        return true;
+
+        for (int count: suitCount.values()) {
+            if (count == 5) return true;
+        }
+
+        return false;
     }
 
     private static boolean checkStraight(ArrayList<Card> cards) {
