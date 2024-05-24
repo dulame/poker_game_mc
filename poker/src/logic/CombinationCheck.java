@@ -13,22 +13,15 @@ public class CombinationCheck {
             return new Combination(HandRanking.ERROR, null);
         }
 
-        Combination dealerCombination = getCombination(dealerCards, dealerCards.size() - 1);
+        Combination dealerCombination = getCombination(dealerCards);
 
-        ArrayList<Card> cards = new java.util.ArrayList<>(Stream.of(playerCards, dealerCards)
+        ArrayList<Card> cards = new ArrayList<>(Stream.of(playerCards, dealerCards)
                 .flatMap(Collection::stream)
                 .toList());
 
         Collections.sort(cards);
 
-        int index = cards.size() - playerCards.size() - 1;
-
-        Combination combination1to5 = getCombination(getSubList(cards, 0, 5), index);
-        Combination combination2to6 = getCombination(getSubList(cards, 1, 6), index);
-        Combination combination3to7 = getCombination(getSubList(cards, 2, 7), index);
-        Combination combinationFlush = getCombination(cards, cards.size() - 1);
-
-        Combination combination = Compare.highestCombination(combination1to5, combination2to6, combination3to7, combinationFlush);
+        Combination combination = getCombination(cards);
 
         if (dealerCombination.equals(combination)) {
             if (playerCards.get(0).getNumericValue() > playerCards.get(1).getNumericValue()) {
@@ -41,17 +34,9 @@ public class CombinationCheck {
         return combination;
     }
 
-    private static ArrayList<Card> getSubList(ArrayList<Card> cards, int from, int to) {
-        ArrayList<Card> res = new ArrayList<>();
-
-        for (int i = from; i < to; ++i) {
-            res.add(cards.get(i));
-        }
-        return res;
-    }
-
-    private static Combination getCombination(ArrayList<Card> cards, int lastIndex) {
+    private static Combination getCombination(ArrayList<Card> cards) {
         Map<Value, Integer> countRank = getRankCount(cards);
+        int lastIndex = cards.size() - 1;
 
         if (royalFlush(cards)) return new Combination(HandRanking.ROYAL_FLUSH, cards.get(lastIndex));
 
@@ -115,7 +100,8 @@ public class CombinationCheck {
     }
 
     private static boolean royalFlush(ArrayList<Card> cards) {
-        return cards.get(cards.size() - 1).getValue() == Value.ACE && straightFlush(cards);
+        if (!(cards.get(cards.size() - 1).getValue() == Value.ACE && straightFlush(cards))) return false;
+        return cards.get(cards.size() - 1).getSuit() == cards.get(cards.size() / 2).getSuit();
     }
 
     private static boolean straightFlush(ArrayList<Card> cards) {
@@ -151,19 +137,24 @@ public class CombinationCheck {
         }
 
         for (int count: suitCount.values()) {
-            if (count == 5) return true;
+            if (count >= 5) return true;
         }
 
         return false;
     }
 
     private static boolean checkStraight(ArrayList<Card> cards) {
+        int cnt = 0;
+
         for (int i = 0; i < cards.size() - 1; ++i) {
-            if (cards.get(i).getNumericValue() + 1 != cards.get(i + 1).getNumericValue()) {
-                return false;
+            if (cards.get(i).getNumericValue() + 1 == cards.get(i + 1).getNumericValue()) {
+                if (++cnt == 4) return true;
+            } else {
+                cnt = 0;
             }
         }
-        return true;
+
+        return false;
     }
 
     private static boolean checkThreeOfKind(Map<Value, Integer> countRank) {
